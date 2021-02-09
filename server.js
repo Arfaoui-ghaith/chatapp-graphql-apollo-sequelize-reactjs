@@ -1,10 +1,12 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const { sequelize } = require('./models');
+const dotenv = require('dotenv');
 
 const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
 
+dotenv.config({ path: './config.env' });
 process.on('uncaughtException', (err) => {
   console.log(err);
   console.log('UNCAUGHT EXCEPTION! Shutting down....');
@@ -12,7 +14,11 @@ process.on('uncaughtException', (err) => {
 });
 
 const app = express();
-const apollo = new ApolloServer({ typeDefs, resolvers });
+const apollo = new ApolloServer({ 
+  typeDefs, 
+  resolvers,
+  context: ctx => ctx
+});
 
 apollo.applyMiddleware({ app });
 

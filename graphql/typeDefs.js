@@ -28,9 +28,11 @@ type User {
     password: String!
     createdAt: dateScalar
     updatedAt: String
+    token: String
 }
 type Query {
     users: [User]!
+    login(username: String! password: String!): User!
 }
 
 type Mutation {

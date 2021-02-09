@@ -1,19 +1,93 @@
 const models  = require('../models/index');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
-const { UserInputError } = require('apollo-server');
+const { UserInputError, AuthenticationError } = require('apollo-server');
+const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
+
+const signToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+/*const protect = async (context) => {
+  
+};*/
 
 module.exports = {
     Query: {
-      users: async () => {
-        try{
+      users: async (_, __,context) => {
+      try{
+        let decoded;
+        
+        let token;
+        if (
+          context.req.headers.authorization &&
+          context.req.headers.authorization.startsWith('Bearer')
+        ) {
+          token = context.req.headers.authorization.split(' ')[1];
+        }
+        
+        if(!token){
+          throw new AuthenticationError('UNAUTHENTICATED');
+        }
+
+        jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+          if(err) {throw new AuthenticationError('UNAUTHENTICATED');}
+              
+          decoded = decodedToken;
+          
+        });
+        
+        console.log(decoded);
+        
+
+        const userAuth = await models.User.findByPk(decoded.id);
+          
+
+        context.req.user = userAuth.dataValues;
+        console.log('userAuth',context.req.user);
         const users = await models.User.findAll();
         
         return users;
+
       }catch(error){
-          console.log('Something went wrong on fetching users',error);
+        throw error
       }
+
     },
+      login: async (_,args) => {
+        const {username, password} = args;
+        let errors = {};
+        try{
+          if(username.trim() === '') {errors.username = 'Please provide a username';}
+          if(password === '') errors.password = 'Please provide a password';
+
+          if(Object.keys(errors).length > 0){
+            throw new AuthenticationError('Username or Password Empty',{errors});
+          }
+
+          const user = await models.User.findOne({ where: {username: username} });
+          if(!user){
+            errors.username = 'user not found';
+            throw new AuthenticationError('User not found',{errors}); 
+          }
+
+          const correctPassword = await bcrypt.compare(password,user.password);
+          if(!correctPassword){
+            errors.password = 'password is incorrect';
+            throw new AuthenticationError('Password is incorrect',{errors}); 
+          }
+
+          const token = signToken(user.id);
+          user.token = token;
+          return user;
+        }catch(error){
+          console.log(error);
+          throw error
+        }
+      },
     },
     Mutation: {
       register: async (_, args) => {
