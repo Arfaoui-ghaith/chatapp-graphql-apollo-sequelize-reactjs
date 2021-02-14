@@ -30,12 +30,23 @@ type User {
     updatedAt: String
     token: String
 }
+
+type Message {
+    id: String!
+    to: String!
+    from: String!
+    createdAt: dateScalar
+    content: String!
+}
+
 type Query {
     users: [User]!
     login(username: String! password: String!): User!
+    getMessages(from: String!): [Message]!
 }
 
 type Mutation {
   register(username: String! email: String! password: String! confirmPassword: String!): User!
+  sendMessage(to: String! content: String!): Message!
 }`
 

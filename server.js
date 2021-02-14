@@ -2,9 +2,10 @@ const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const { sequelize } = require('./models');
 const dotenv = require('dotenv');
+const contextMiddleware = require('./utils/contextMiddleware');
 
 const typeDefs = require('./graphql/typeDefs');
-const resolvers = require('./graphql/resolvers');
+const resolvers = require('./graphql/resolvers/index');
 
 dotenv.config({ path: './config.env' });
 process.on('uncaughtException', (err) => {
@@ -17,7 +18,7 @@ const app = express();
 const apollo = new ApolloServer({ 
   typeDefs, 
   resolvers,
-  context: ctx => ctx
+  context: contextMiddleware
 });
 
 apollo.applyMiddleware({ app });

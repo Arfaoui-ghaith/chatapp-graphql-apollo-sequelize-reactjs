@@ -1,4 +1,4 @@
-const models  = require('../models/index');
+const models  = require('../../models/index');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 const { UserInputError, AuthenticationError } = require('apollo-server');
@@ -104,40 +104,6 @@ module.exports = {
           throw new UserInputError('Bad input',{errors});
         }
     },
-    sendMessage: async (parent, args, {user}) => {
-        try{
-          let from;
-          if(!user){
-            throw new AuthenticationError('UNAUTHENTICATED');
-          }else {
-            models.User.findByPk(user.id).then((user) => from = user.username).catch((err) => {throw new AuthenticationError('UNAUTHENTICATED');});
-          }
 
-          const recipient = await models.User.findOne({ where: {username: args.to} });
-
-          //console.log(recipient.username,user.username,recipient.username === user.username)
-
-          if(!recipient){
-            throw new UserInputError('User recipient not found');
-          } else if (recipient.username === from) {
-            
-            throw new UserInputError('you cant message your-self');
-          }
-
-          if(args.content.trim() === ''){
-            throw new UserInputError('Content o message is empty');
-          }
-          const id = uuidv4();
-          console.log({id, content: args.content, from, to:args.to});
-
-          const message = await models.Message.create({id, content: args.content, from, to:args.to});
-
-          return message;
-
-        }catch(err){
-          console.log(err);
-          throw err
-        }
-      }
     },
 }
