@@ -1,6 +1,7 @@
 import React from 'react'
 import {Container, Row, Col, Form, Button} from 'react-bootstrap';
 import { gql, useLazyQuery } from '@apollo/client';
+import { useAuthDispatch } from '../context/auth';
 
 const LOGIN_USER = gql`
   query login($username: String! $password: String! ) {
@@ -21,11 +22,14 @@ export default function Login(props) {
       });
 
     const [errors, setErrors] = React.useState({});
+
+    const dispatch = useAuthDispatch();
     
     const [loginUser, { loading }] = useLazyQuery(LOGIN_USER, {
       onCompleted(data){
           console.log(data);
-          localStorage.setItem('tokenCHATAPP',data.login.token);
+          /*localStorage.setItem('tokenCHATAPP',data.login.token);*/
+          dispatch({ type:'LOGIN', payload: data.login });
           props.history.push('/');
       },
       onError(err){
@@ -46,7 +50,7 @@ export default function Login(props) {
     <Container className="App pt-5">
       <Row className="bg-white py-5 justify-content-center">
         <Col className="col-sm-8 col-md-6 col-lg-4">
-        <h1 className="text-center">Register</h1>
+        <h1 className="text-center">Login</h1>
         <Form onSubmit={submitLogin}>
           <Form.Group controlId="formBasicEmail">
             <Form.Label className={errors.username && 'text-danger'}>
