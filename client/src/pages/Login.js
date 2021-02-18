@@ -6,8 +6,6 @@ import { useAuthDispatch } from '../context/auth';
 const LOGIN_USER = gql`
   query login($username: String! $password: String! ) {
     login(username:$username password:$password) {
-      username
-      email
       token
     }
   }

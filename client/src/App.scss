@@ -2,10 +2,26 @@ $blue: #1877f2;
 $green: #42b72a;
 
 $border-radius: 0;
+$paragraph-margin-bottom: 0;
+$gray-600: rgb(245, 245, 245);
 
 @import "~bootstrap/scss/bootstrap";
 
 body {
   min-height: 100vh !important;
   background: linear-gradient(345deg, #9400d3, #00ced1);
+}
+
+.user-div:hover {
+  background-color: #259ad1;
+  p {
+    color: white;
+  }
+}
+
+.selectedUser {
+  background-color: #259ad1;
+  p {
+    color: white;
+  }
 }
