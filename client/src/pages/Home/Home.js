@@ -5,6 +5,7 @@ import { useAuthDispatch } from '../../context/auth'
 import Users from './Users';
 import Messages from './Messages';
 
+
 export default function Home(props) {
     const [selectedUser, setSelectedUser] = React.useState(null);
 
@@ -12,7 +13,7 @@ export default function Home(props) {
 
     const logout = () => {
         dispatch({ type:'LOGOUT' });
-        props.history.push('/login');
+        window.location.href = '/login';
     }
     return (
         <React.Fragment>

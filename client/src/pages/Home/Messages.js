@@ -2,6 +2,9 @@ import React from 'react'
 import { gql, useLazyQuery } from '@apollo/client';
 import { Row, Col, Button, Image } from 'react-bootstrap'
 import { useMessageDispatch, useMessageState } from '../../context/message';
+import Message from './Message';
+
+
 
 const GET_MESSAGES = gql`
 query getMessages($from: String!){
@@ -11,6 +14,11 @@ query getMessages($from: String!){
 }`;
 
 export default function Messages() {
+    const style={
+        "height": "500px",
+        "overflow-y": "scroll",
+    }
+
     const { selectedUser } = useMessageState();
     const [getMessages, { loading: messagesLaoding, data: messagesData, error: errorMessages }] = useLazyQuery(GET_MESSAGES);
     
@@ -24,12 +32,12 @@ export default function Messages() {
     if(errorMessages){ console.log(errorMessages) }
 
     return (
-        <Col key="messagesPart" xs={8}>
+        <Col key="messagesPart" xs={8} style={style} className="my-2 d-flex flex-column-reverse">
             {messagesData && messagesData.getMessages.length > 0 ? (
                 messagesData.getMessages.map((message) => (
-                    <p key={message.id}> {message.content} </p>
+                    <Message key={message.id} message={message} />
                 )) 
-            ) : <p key="genesis" className="text-center"> Say Hello ! </p>}
+            ) : <p className="text-center"> Say Hello ! </p>}
         </Col>
     )
 }
